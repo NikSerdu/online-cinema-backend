@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+  email      String   @unique
+  password   String
+  name       String   @unique
+  avatarPath String   @default("/uploads/default-avatar.png") @map("avatar_path")
+  phone      String   @default("")
+  isAdmin    Boolean  @default(false)
+  reviews    Review[]
+  watchLater Film[]
+}
+
+model Film {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  name        String
+  author      String
+  year        Int
+  country     String
+  duration    Int
+  age         Int
+  description String
+  image       String
+  reviews     Review[]
+  genres      Genre[]
+  users       User[]
+  actors      Actor[]
+}
+
+model Actor {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  name      String
+  image     String
+
+  films Film[]
+}
+
+model Genre {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  name      String   @unique
+  slug      String   @unique
+  films     Film[]
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  rating    Int
+  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int      @map("user_id")
+  film      Film     @relation(fields: [filmId], references: [id])
+  filmId    Int      @map("film")
+}
